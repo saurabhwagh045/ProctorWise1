@@ -8,61 +8,68 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           $password = $_POST["password"];
          
 
-        $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+        //$sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+         $sql = "SELECT * FROM users WHERE username = '$username'";
         $select = mysqli_query($con,$sql);
         $row = mysqli_fetch_array($select);
 
         $status = $row['status'];
-        if($status){
+      /*  if($status == 'app'){
             $pending =true;
         }
-
+      */
         $select2 = mysqli_query($con,$sql);
         $check_user = mysqli_num_rows($select2);
 
 
                       if($check_user==1){
-                        $_SESSION["status"]=$row['status'];
-                        $_SESSION["username"]=$row['username'];
-                        $_SESSION["password"]=$row['password'];
-                        $usertype = $row['usertype'];
-            
-                        if($usertype=="user"){
+                        while($count = mysqli_fetch_assoc($select2)){
+                          if(password_verify($password,$count['password'])){
 
-                                    if($status=="approved"){
-                                      $login = true;
-                                    session_start();
-                                  $_SESSION['loggedin'] = true;
-                                  $_SESSION['username'] = $username;
-                                  header("location: welcome.php");              
-                                  }
-                                      if($status=="pending"){
-                                        // $pending =true;
-                                        // header("location: login.php");
-                                      }else{
-                                          echo "Incorrect username or Password";
+                            $_SESSION["status"]=$row['status'];
+                            $_SESSION["username"]=$row['username'];
+                            $_SESSION["password"]=$row['password'];
+                            $usertype = $row['usertype'];
+                
+                            if($usertype=="user"){
+    
+                                        if($status=="approved"){
+                                            $login = true;
+                                            session_start();
+                                            $_SESSION['loggedin'] = true;
+                                            $_SESSION['username'] = $username;
+                                          header("location: welcome.php");              
                                       }
-                                  }else{
-
-                                    if($status=="approved"){
-                                      $login = true;
-                                    session_start();
-                                  $_SESSION['loggedin'] = true;
-                                  $_SESSION['username'] = $username;
-                                  header("location: welcome_admin.php");              
-                                  }
-                                      if($status=="pending"){
-                                        // $pending =true;
-                                        // header("location: login.php");
+                                          elseif($status=="pending"){
+                                             $pending =true;
+                                            // header("location: login.php");
+                                              
+                                          }
                                       }else{
-                                          echo "Incorrect username or Password";
+    
+                                        if($status=="approved"){
+                                          $login = true;
+                                          session_start();
+                                          $_SESSION['loggedin'] = true;
+                                          $_SESSION['username'] = $username;
+                                          header("location: welcome_admin.php");              
                                       }
+                                          elseif($status=="pending"){
+                                            // $pending =true;
+                                            // header("location: login.php");
+                                            $pending = true;
+                                          }
+    
+                                      }
+                          }else{
+                            $passErr = true;
+                          }
+                        }
 
-                                  }
-                                   
+                    }else{
+                      $passErr = true;
                     }
     }
-
 ?>
 
 <!doctype html>
@@ -89,17 +96,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
            ?>
             
             <?php
-           if($passErr){
-          echo ' <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                  <strong>Error!<br></strong>PassWord Does not match.
-                                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                  </button>
-                                </div> ';
-                              }
-           ?>
-
-             <?php
            if($passErr){
           echo ' <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                   <strong>Error!<br></strong>PassWord Does not match.

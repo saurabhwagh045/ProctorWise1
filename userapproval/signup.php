@@ -43,8 +43,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                      
         }else{
 
-            if(($password == $cpassword)){
-                 $sql = "INSERT INTO `users` (`username`, `name`,  `dob`, `adhar`, `email`, `stud_image`,`stud_sign`, `password`, `status`) VALUES ('$username','$name','$dob','$adhar', '$email','$image','$sign','$password', 'pending')";
+            if(($password == $cpassword)){ 
+                 $hash = password_hash($password, PASSWORD_DEFAULT);
+                 $sql = "INSERT INTO `users` (`username`, `name`,  `dob`, `adhar`, `email`, `stud_image`,`stud_sign`, `password`, `status`) VALUES ('$username','$name','$dob','$adhar', '$email','$image','$sign','$hash', 'pending')";
                  $result = mysqli_query($con,$sql);
                  
                             if ($result){
